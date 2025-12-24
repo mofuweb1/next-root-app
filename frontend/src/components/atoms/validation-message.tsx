@@ -1,6 +1,6 @@
 /**************************************************
  * Validation messageコンポーネント
- *
+ * ※messageは1件ごとに改行必要
  **************************************************/
 import * as React from "react";
 
@@ -12,10 +12,7 @@ interface ValidationMessageProps {
   isVisible?: boolean;
 }
 
-export const ValidationMessage: React.FC<ValidationMessageProps> = ({
-  message,
-  isVisible = false,
-}) => {
+export const ValidationMessage: React.FC<ValidationMessageProps> = ({ message, isVisible = false }) => {
   if (!isVisible || !message) return null;
 
   return (
