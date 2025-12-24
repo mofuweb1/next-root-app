@@ -1,8 +1,7 @@
 "use client";
 
-// React、MUI
+// React
 import { JSX, useState, useEffect, useCallback } from "react";
-import { Box, Backdrop, CircularProgress, Button } from "@mui/material";
 
 // AG Grid
 import type { RowDoubleClickedEvent } from "ag-grid-community";
@@ -11,15 +10,19 @@ import type { RowDoubleClickedEvent } from "ag-grid-community";
 import { Table } from "./table";
 import { ModalForm } from "./modal-form";
 
+// Common
+import { sanitize } from "@/common/utilities/sanitize";
+// import { useRenderTimer } from "@/hooks/common/useRenderTimer";
+
+// Components
+import { Button } from "@/components/atoms/button";
+import { Loading } from "@/components/atoms/loading";
+import { PageMessage } from "@/components/molecules/page-message";
+
 // Data、Service
 import { useApiRequest } from "@/hooks/common/useApiRequest";
 import { User } from "@/types/User";
 import { createUserService } from "@/services/createUserService";
-
-// Common
-import { SnackbarContainer } from "@/common/organisms/SnackbarContainer";
-import { sanitize } from "@/common/utilities/sanitize";
-// import { useRenderTimer } from "@/hooks/common/useRenderTimer";
 
 // Template (Layout & stateを持つ場所)
 export default function Template(): JSX.Element {
@@ -30,7 +33,6 @@ export default function Template(): JSX.Element {
    * 状態 (State)、カスタムフック、共通関数
    *
    **************************************************/
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string }>({ open: false, message: "" });
@@ -174,40 +176,39 @@ export default function Template(): JSX.Element {
    *
    **************************************************/
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", gap: "5px" }}>
-      <Box sx={{ flex: "0 0 auto" }}>
-        <h2>ユーザー一覧</h2>
-      </Box>
-
-      {/* Table (organisms) */}
-      <Box sx={{ flex: "1 1 auto" }}>
-        <Table rowData={rowData} onRowDoubleClick={handleRowDoubleClick} />
-      </Box>
-
-      {/* ModalForm (organisms) */}
-      {/* keyは再マウント用、propsで受取不可 */}
-      <ModalForm key={openModalKey} isOpen={isOpenModal} data={data} onFormSubmit={handleSubmit} onDelete={handleDelete} onClose={handleClose} />
-
-      <Box sx={{ flex: "0 0 auto" }}>
-        <Box sx={{ display: "inline-block" }}>
-          <Button size="small" variant="contained" color="primary" onClick={() => onDataFetch()}>
-            データ再取得
-          </Button>
-        </Box>
-        <Box sx={{ display: "inline-block", marginLeft: "5px" }}>
-          <Button size="small" variant="contained" color="primary" onClick={onOpen}>
-            新規登録
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Loading */}
-      <Backdrop open={isLoading} sx={{ zIndex: (theme) => theme.zIndex.tooltip + 1, backgroundColor: "transparent" }}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
-      {/* Message */}
-      <SnackbarContainer open={snackbar.open} message={snackbar.message} onClose={() => setSnackbar({ ...snackbar, open: false })} />
-    </Box>
+    <>
+      {/* <Box sx={{ display: "flex", flexDirection: "column", height: "100%", gap: "5px" }}> */}
+      <div className="flex h-full flex-col gap-[5px]">
+        {/*<Box sx={{ flex: "0 0 auto" }}> */}
+        <div className="flex-none">
+          <h2>ユーザー一覧</h2>
+        </div>
+        {/* Table (organisms) */}
+        {/*<Box sx={{ flex: "1 1 auto" }}> */}
+        <div className="flex-1">
+          <Table rowData={rowData} onRowDoubleClick={handleRowDoubleClick} />
+        </div>
+        {/* ModalForm (organisms) */}
+        {/* keyは再マウント用、propsで受取不可 */}
+        <ModalForm key={openModalKey} isOpen={isOpenModal} data={data} onFormSubmit={handleSubmit} onDelete={handleDelete} onClose={handleClose} />
+        {/* <Box sx={{ flex: "0 0 auto" }}> */}
+        <div className="flex-none">
+          <div className="inline-block">
+            <Button type="button" variant="info" disabled={false} onClick={() => onDataFetch()}>
+              データ再取得
+            </Button>
+          </div>
+          <div className="ml-[5px] inline-block">
+            <Button type="button" variant="primary" disabled={false} onClick={() => onOpen()}>
+              新規登録
+            </Button>
+          </div>
+        </div>
+        {/* Loading */}
+        {isLoading && <Loading isLoading={isLoading} />}
+        {/* Message */}
+        {error?.message && <PageMessage variant="info" message={error?.message} onClose={() => setSnackbar({ ...snackbar, open: false })} />}
+      </div>
+    </>
   );
 }
